@@ -29,7 +29,7 @@ confile.close()
 
 def doorgaan():
     global r
-    doorgaan = prompt.ask("Wil je doorgaan?", choices=["y", "n", ""]).lower()
+    doorgaan = prompt.ask("Wil je doorgaan?", choices=["y", "n", "qq"]).lower()
     if doorgaan == "y" or doorgaan == "":
         return True
     elif doorgaan == "n" or doorgaan == "qq":
@@ -49,7 +49,7 @@ def reset():
 while r:
     print("\n"*150)
     print(opties)
-    optie = prompt.ask("Selecteer een optie", choices=["1", "2", "3", "4", "5"], show_choices=False)
+    optie = prompt.ask("Selecteer een optie", choices=["1", "2", "3", "4", "5", "qq"], show_choices=False)
     reset()
     if optie == "1":
         print(contactenTable)
@@ -76,10 +76,9 @@ while r:
         if not doorgaan():
             r = False
     elif optie == "4":
-        wie = prompt.ask("[green]Wie wil je verwijderen?")
+        wie = prompt.ask("[green]Wie wil je verwijderen?", choices=contacten)
         contacten.pop(wie)
         print("[red]Verwijderd!")
-        print(contacten)
         if not doorgaan():
             r = False
     elif optie == "5":
@@ -93,3 +92,5 @@ while r:
         print("[green]Opgeslagen!")
         if not doorgaan():
             r = False
+    elif optie == "qq":
+        r = False
