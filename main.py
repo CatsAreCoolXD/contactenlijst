@@ -18,19 +18,21 @@ opties.add_row("3.", "Pas een contact aan", "", "")
 
 r = True
 contacten = {}
+contactenNamen = []
 confile = open("contacten.txt")
 for line in confile:
     contactNaam = line.split(",")[0]
     contactTelefoon = line.split(",")[1]
     contacten[contactNaam] = contactTelefoon
+    contactenNamen.append(contactNaam)
 confile.close()
 
 def doorgaan():
     global r
-    doorgaan = prompt.ask("Wil je doorgaan?", choices=["y", "n", "\n"]).lower()
-    if doorgaan == "y" or doorgaan == "\n":
+    doorgaan = prompt.ask("Wil je doorgaan?", choices=["y", "n", ""]).lower()
+    if doorgaan == "y" or doorgaan == "":
         return True
-    elif doorgaan == "n":
+    elif doorgaan == "n" or doorgaan == "qq":
         return False
 contactenTable = Table(title="Contacten")
 
@@ -64,9 +66,12 @@ while r:
         aanpassen = prompt.ask("[red]Wat wil je aanpassen?", choices=["Telefoonnummer".lower(), "Naam".lower()]).lower()
         if aanpassen == "telefoonnummer":
             aanpassenValue = prompt.ask("[yellow]Naar wat wil je het veranderen?")
+            contacten[pasNaam] = aanpassenValue
         elif aanpassen == "naam":
             aanpassenValue = prompt.ask("[green]Naar wat wil je het veranderen?")
-        contacten[pasNaam] = aanpassenValue
+            contactTelefoonnummer = contacten[pasNaam]
+            contacten.pop(pasNaam)
+            contacten.update({aanpassenValue: contactTelefoonnummer})
         print("[green]Aangepast!")
         if not doorgaan():
             r = False
