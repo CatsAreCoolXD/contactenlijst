@@ -27,7 +27,7 @@ confile.close()
 
 def doorgaan():
     global r
-    doorgaan = prompt.ask("Wil je doorgaan?", choices=["y", "n"]).lower()
+    doorgaan = prompt.ask("Wil je doorgaan?", choices=["y", "n", "\n"]).lower()
     if doorgaan == "y" or doorgaan == "\n":
         return True
     elif doorgaan == "n":
@@ -35,6 +35,7 @@ def doorgaan():
 contactenTable = Table(title="Contacten")
 
 def reset():
+    print("\n" * 150)
     global contactenTable
     contactenTable = Table(title="Contacten")
 
