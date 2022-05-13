@@ -8,7 +8,7 @@ import os
 r = True
 
 def setup():
-    global r
+    global r, opties, contacten, contactenNamen
     opties = Table(title="Opties") # Maak de optie tabel
 
     opties.add_column("Optie", justify="left", no_wrap=True, style="cyan")
@@ -102,6 +102,8 @@ def slaContactenOp():
     print("[green]Opgeslagen!")
     if not doorgaan():
         r = False
+
+setup()
 
 def main(): # main
     global r, opties
