@@ -5,11 +5,8 @@ import os
 
 # Rich is nodig, pip install rich
 
-r = True
 
-def setup():
-    global r, opties, contacten, contactenNamen
-    opties = Table(title="Opties") # Maak de optie tabel
+def setup(opties, contacten, contactenNamen):
 
     opties.add_column("Optie", justify="left", no_wrap=True, style="cyan")
     opties.add_column("Actie", justify="left", style="magenta")
@@ -20,8 +17,6 @@ def setup():
     opties.add_row("2.", "Voeg contact toe", "5.", "Sla mijn contacten op")
     opties.add_row("3.", "Pas een contact aan", "", "")
 
-    contacten = {}
-    contactenNamen = []
     confile = open("contacten.txt")
     for line in confile: # Zet de contacten in de dict
         contactNaam = line.split(",")[0]
@@ -29,20 +24,18 @@ def setup():
         contacten[contactNaam] = contactTelefoon
         contactenNamen.append(contactNaam)
     confile.close()
+    return opties, contacten, contactenNamen
 
 def doorgaan(): # Wilt de gebruiker doorgaan?
-    global r
     doorgaan = prompt.ask("Wil je doorgaan?", choices=["y", "n", "qq", ""]).lower()
     if doorgaan == "y" or doorgaan == "":
         return True
     elif doorgaan == "n" or doorgaan == "qq":
         return False
 
-contactenTable = Table(title="Contacten")
 
-def reset():
+def update(contacten):
     print("\n" * 150)
-    global contactenTable
     contactenTable = Table(title="Contacten") # Pas alles aan
 
     contactenTable.add_column("Contact", justify="left", style="green")
@@ -51,31 +44,26 @@ def reset():
     for naam in contacten:
         contactenTable.add_row(naam, contacten[naam])
 
+    return contactenTable
 
-def verwijderContact():
-    global r, contacten
+
+def verwijderContact(contacten):
     wie = prompt.ask("[green]Wie wil je verwijderen?", choices=contacten)
     contacten.pop(wie) # Haal het contact weg
     print("[red]Verwijderd!")
-    if not doorgaan():
-        r = False
+    return contacten
 
-def bekijkContacten():
-    global r, contactenTable
-    print(contactenTable) # Laat de contacten zien
-    if not doorgaan():
-        r = False
+def bekijkContacten(contactenTable, contacten):
+    contactenTable = update(contacten)
+    return contactenTable # Laat de contacten zien
 
-def voegContactToe():
-    global r, contacten
+def voegContactToe(contacten):
     nieuwNaam = prompt.ask("[green]Wie wil je toevoegen?")
     nieuwTelefoonnummer = prompt.ask(f"[yellow]Wat is {nieuwNaam}'s telefoonnummer?")
     contacten[nieuwNaam] = nieuwTelefoonnummer # Pas het aan
-    if not doorgaan():
-        r = False
+    return contacten
 
-def pasContactAan():
-    global r, contacten
+def pasContactAan(contacten):
     pasNaam = prompt.ask("[green]Wie wil je aanpassen?", choices=contacten)
     aanpassen = prompt.ask("[red]Wat wil je aanpassen?", choices=["Telefoonnummer".lower(), "Naam".lower()]).lower()
     if aanpassen == "telefoonnummer":
@@ -86,12 +74,10 @@ def pasContactAan():
         contactTelefoonnummer = contacten[pasNaam]
         contacten.pop(pasNaam)
         contacten.update({aanpassenValue: contactTelefoonnummer})
+    return contacten
     print("[green]Aangepast!")
-    if not doorgaan():
-        r = False
 
-def slaContactenOp():
-    global r, contacten
+def slaContactenOp(contacten):
     newconfile = ""
     for contact in contacten: # Zet alle contacten in een string
         newconfile += f"{contact},{contacten[contact]},\n"
@@ -100,29 +86,37 @@ def slaContactenOp():
     confile.write(newconfile) # Voeg de nieuwe contacten toe
     confile.close()
     print("[green]Opgeslagen!")
-    if not doorgaan():
-        r = False
 
-setup()
 
 def main(): # main
-    global r, opties
+    contacten = {}
+    contactenNamen = []
+    opties = Table(title="Opties")
+    contactenTable = Table(title="Contacten")
+    r = True
+    setups = setup(opties, contacten, contactenNamen)
+    opties = setups[0]
+    contacten = setups[1]
+    contactenNamen = setups[2]
+
+
     while r:
         print("\n"*150)
         print(opties)
         optie = prompt.ask("Selecteer een optie", choices=["1", "2", "3", "4", "5", "qq"], show_choices=False)
-        reset()
         if optie == "1":
-            bekijkContacten()
+            print(bekijkContacten(contactenTable, contacten))
         elif optie == "2":
-            voegContactToe()
+            contacten = voegContactToe(contacten)
+            print("[green]Toegevoegd!")
         elif optie == "3":
-            pasContactAan()
+            contacten = pasContactAan(contacten)
         elif optie == "4":
-            verwijderContact()
+            contacten = verwijderContact(contacten)
         elif optie == "5":
-            slaContactenOp()
+            slaContactenOp(contacten)
         elif optie == "qq":
             r = False
+        r = doorgaan()
 
 main()
